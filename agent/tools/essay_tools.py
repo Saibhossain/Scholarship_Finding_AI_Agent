@@ -1,30 +1,50 @@
-from langchain.chat_models import ChatOpenAI
 from langchain.tools import tool
+from agent.config import get_llm
+from agent.prompts.system_prompts import ESSAY_PROMPT, EVALUATION_PROMPT
 
-llm = ChatOpenAI(model="gpt-4o-mini")
+llm = get_llm()
+
 
 @tool
 def write_essay(profile: dict, scholarship: dict):
-    prompt = f"""
-    Write a professional scholarship essay.
-
-    Profile:
-    {profile}
-
-    Scholarship:
-    {scholarship}
-
-    400 words, compelling.
+    """
+    Generate a highly personalized scholarship essay.
     """
 
-    return llm.invoke(prompt).content
+    # Extract meaningful fields (avoid dumping raw dict blindly)
+    structured_profile = f"""
+    Name: {profile.get('name')}
+    Field: {profile.get('field')}
+    GPA: {profile.get('gpa')}
+    Level: {profile.get('level')}
+    Country Preference: {profile.get('country_preference')}
+    English Test: {profile.get('english_test')}
+    """
 
+    structured_scholarship = f"""
+    Name: {scholarship.get('name')}
+    Description: {scholarship.get('description')}
+    Eligibility: {scholarship.get('eligibility')}
+    Benefits: {scholarship.get('benefits')}
+    """
+
+    prompt = ESSAY_PROMPT.format(
+        profile=structured_profile,
+        scholarship=structured_scholarship
+    )
+
+    response = llm.invoke(prompt).content
+
+    return response
 
 @tool
 def evaluate_essay(essay: str):
-    return llm.invoke(f"""
-    Evaluate this essay (score 1-10 + feedback):
+    """
+    Evaluate essay quality and provide feedback.
+    """
 
-    {essay}
-    """).content
+    response = llm.invoke(
+        EVALUATION_PROMPT + f"\n\nEssay:\n{essay}"
+    ).content
 
+    return response
