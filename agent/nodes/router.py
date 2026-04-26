@@ -1,9 +1,17 @@
-def router_node(state):
-    text = state["input"].lower()
+from agent.config import get_llm
+llm =get_llm()
 
-    if "essay" in text:
-        return {"action": "essay"}
-    elif "scholarship" in text:
-        return {"action": "search"}
-    else:
-        return {"action": "profile"}
+def router_node(state):
+    text = state["input"]
+
+    decision = llm.invoke(f"""
+    Classify user intent:
+    - search
+    - essay
+    - profile
+
+    Input: {text}
+    """).content.strip().lower()
+
+    return {"action": decision}
+
