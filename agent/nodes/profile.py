@@ -1,23 +1,15 @@
-from langchain.chat_models import ChatOpenAI
-import json
-
-llm = ChatOpenAI(model="gpt-4o-mini")
+from agent.db.database import SessionLocal
+from agent.db.crud import update_profile
 
 def profile_node(state):
-    text = state["input"]
+    db = SessionLocal()
 
-    extraction = llm.invoke(f"""
-    Extract structured JSON:
+    profile = update_profile(
+        db,
+        state["session_id"],
+        state.get("extracted_data", {})
+    )
 
-    {text}
-    """).content
+    db.close()
 
-    try:
-        data = json.loads(extraction)
-    except:
-        data = {}
-
-    profile = state.get("profile", {})
-    profile.update(data)
-
-    return {"profile": profile}
+    return {"profile": profile.__dict__}
