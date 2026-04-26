@@ -8,7 +8,7 @@ llm = get_llm()
 @tool
 def write_essay(profile: dict, scholarship: dict):
     """
-    Generate a highly personalized scholarship essay.
+    Generate a personalized scholarship essay using student profile and scholarship details.
     """
 
     # Extract meaningful fields (avoid dumping raw dict blindly)
@@ -37,10 +37,11 @@ def write_essay(profile: dict, scholarship: dict):
 
     return response
 
+
 @tool
 def evaluate_essay(essay: str):
     """
-    Evaluate essay quality and provide feedback.
+    Evaluate a scholarship essay and provide score, strengths, weaknesses, and suggestions.
     """
 
     response = llm.invoke(
