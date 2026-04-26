@@ -13,3 +13,4 @@ def search_web(query: str):
 
     res = requests.post(url, json=payload)
     return res.json()
+

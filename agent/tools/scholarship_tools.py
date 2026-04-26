@@ -19,3 +19,4 @@ def find_scholarships(profile: dict):
     res = requests.get(url, headers=headers, params=params)
 
     return res.json()
+
